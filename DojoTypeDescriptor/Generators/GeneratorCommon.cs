@@ -115,7 +115,7 @@ namespace DojoTypeDescriptor.Generators
                 properties.ForEach(p =>
                 {
                     result += AddComment(p.Description);
-                    result += AddLine("var " + EscapeKeywords(p.Name) + ": " + p.Types.First());
+                    result += AddLine(EscapeKeywords(p.Name) + ": " + p.Types.First() + ";");
                 });
             }
 

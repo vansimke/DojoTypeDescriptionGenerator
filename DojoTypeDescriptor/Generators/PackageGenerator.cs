@@ -44,6 +44,18 @@ namespace DojoTypeDescriptor.Generators
             return result;
         }
 
+        public static string WriteModuleDeclares(DojoPackage obj)
+        {
+            string result = "";
+
+            obj.Functions.ForEach(f => result += FunctionGenerator.WriteModuleDeclares(f));
+            obj.Objects.ForEach(o => result += ObjectGenerator.WriteModuleDeclares(o));
+            obj.Classes.ForEach(c => result += ClassGenerator.WriteModuleDeclares(c));
+            obj.Packages.ForEach(p => result += PackageGenerator.WriteModuleDeclares(p));
+
+            return result;
+        }
+
         
     }
 }

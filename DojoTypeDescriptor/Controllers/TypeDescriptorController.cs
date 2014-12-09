@@ -33,6 +33,7 @@ namespace DojoTypeDescriptor.Controllers
             DojoPackage package = DojoPackageConverter.Convert(resultMerged);
 
             string document = PackageGenerator.Generate(package.Packages.First(p => p.Name.Equals(packageName)));
+            document += PackageGenerator.WriteModuleDeclares(package.Packages.First(p => p.Name.Equals(packageName)));
 
             byte[] bytes = Encoding.UTF8.GetBytes(document.ToCharArray());
 

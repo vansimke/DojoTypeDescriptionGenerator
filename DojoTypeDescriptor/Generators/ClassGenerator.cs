@@ -248,5 +248,22 @@ namespace DojoTypeDescriptor.Generators
 
             return result;
         }
+        public static string WriteModuleDeclares(DojoClass obj)
+        {
+            var result = "";
+
+            result += GeneratorCommon.AddLine("declare module \"" + obj.Name + "\" {");
+            GeneratorCommon.IncreaseIndent();
+            result += GeneratorCommon.AddLine("var exp: " + obj.Name.Replace("/", ".").Replace("-", "_"));
+            result += GeneratorCommon.AddLine("export=exp;");
+            GeneratorCommon.DecreaseIndent();
+            result += GeneratorCommon.AddLine("}");
+
+            obj.ChildClasses.ForEach(c => result += ClassGenerator.WriteModuleDeclares(c));
+            obj.ChildObjects.ForEach(o => result += ObjectGenerator.WriteModuleDeclares(o));
+            
+
+            return result;
+        }
     }
 }

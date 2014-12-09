@@ -8,18 +8,23 @@ namespace DojoTypeDescriptor.Generators
 {
     public class FunctionGenerator
     {
-        public static string Generate(DojoFunction obj)
+        public static string Generate(DojoFunction obj, bool? isMethod = false)
         {
             string result = "";
-            result += GenerateUsage(obj);
+            result += GenerateUsage(obj, isMethod.Value);
 
             if (obj.Properties.Count() > 0 || obj.Methods.Count() > 0 || obj.ChildClasses.Count() > 0 || obj.ChildFunctions.Count > 0 || obj.ChildObjects.Count > 0)
             {
-                result += GeneratorCommon.AddLine("module " + GeneratorCommon.GetShortName(obj.Name) + " {");
 
+                result += GeneratorCommon.AddLine("interface " + GeneratorCommon.GetShortName(obj.Name) + " {");
                 GeneratorCommon.IncreaseIndent();
                 result += GeneratorCommon.GenerateProperties(obj.Properties);
-                obj.Methods.ForEach(m => result += FunctionGenerator.Generate(m));
+                obj.Methods.ForEach(m => result += FunctionGenerator.Generate(m, true));
+                GeneratorCommon.DecreaseIndent();
+                result += GeneratorCommon.AddLine("}") + "\n";
+                
+                result += GeneratorCommon.AddLine("module " + GeneratorCommon.GetShortName(obj.Name) + " {");
+                GeneratorCommon.IncreaseIndent();
                 obj.ChildFunctions.ForEach(cf => result += FunctionGenerator.Generate(cf));
                 obj.ChildClasses.ForEach(cc => result += ClassGenerator.Generate(cc));
                 obj.ChildObjects.ForEach(co => result += ObjectGenerator.Generate(co));
@@ -31,7 +36,7 @@ namespace DojoTypeDescriptor.Generators
             return result;
         }
 
-        private static string GenerateUsage(DojoFunction obj)
+        private static string GenerateUsage(DojoFunction obj, bool isMethod)
         {
             string result = "";
 
@@ -39,9 +44,15 @@ namespace DojoTypeDescriptor.Generators
 
             string comment = GeneratorCommon.AddComment(obj.Description, parameterSource.Parameters, obj.Permalink);
             string functionSignature = "";
-            functionSignature += GeneratorCommon.AddLine("interface " + GeneratorCommon.GetShortName(obj.Name) + "{({0}): {1}}");
 
-
+            if (isMethod)
+            {
+                functionSignature += GeneratorCommon.AddLine(GeneratorCommon.GetShortName(obj.Name) + "({0}): {1};");
+            }
+            else
+            {
+                functionSignature += GeneratorCommon.AddLine("interface " + GeneratorCommon.GetShortName(obj.Name) + "{({0}): {1}}");
+            }
 
             var parameters = new Dictionary<string, List<string>>();
             var argumentLists = new List<string>();
@@ -113,6 +124,24 @@ namespace DojoTypeDescriptor.Generators
                 result += functionSignature.Replace("{0}", al).Replace("{1}", returnTypes.Count > 1 ? "any" : returnTypes.First());
             });
 
+
+            return result;
+        }
+
+        public static string WriteModuleDeclares(DojoFunction obj)
+        {
+            var result = "";
+
+            result += GeneratorCommon.AddLine("declare module \"" + obj.Name + "\" {");
+            GeneratorCommon.IncreaseIndent();
+            result += GeneratorCommon.AddLine("var exp: " + obj.Name.Replace("/", ".").Replace("-", "_"));
+            result += GeneratorCommon.AddLine("export=exp;");
+            GeneratorCommon.DecreaseIndent();
+            result += GeneratorCommon.AddLine("}");
+
+            obj.ChildClasses.ForEach(c => result += ClassGenerator.WriteModuleDeclares(c));
+            obj.ChildFunctions.ForEach(f => result += FunctionGenerator.WriteModuleDeclares(f));
+            obj.ChildObjects.ForEach(o => result += ObjectGenerator.WriteModuleDeclares(o));
 
             return result;
         }
