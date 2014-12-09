@@ -92,6 +92,7 @@ namespace DojoTypeDescriptor.Generators
             var keywords = new List<string>(){
                                "default",
                                "string",
+                               "number",
                                "in"
                            };
 
@@ -100,6 +101,25 @@ namespace DojoTypeDescriptor.Generators
             if (keywords.Contains(value))
             {
                 result += "_";
+            }
+
+            return result;
+
+        }
+
+        public static string EscapeKeywordsInModuleDeclarations(string elementName)
+        {
+            var keywords = new List<string>(){
+                               "default",
+                               "string",
+                               "number"                               
+                           };
+
+            string result = elementName;
+
+            foreach (var keyword in keywords)
+            {
+                result = result.Replace(keyword, keyword + "_");
             }
 
             return result;

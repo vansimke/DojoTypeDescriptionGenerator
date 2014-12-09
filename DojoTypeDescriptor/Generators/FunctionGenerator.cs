@@ -134,7 +134,7 @@ namespace DojoTypeDescriptor.Generators
 
             result += GeneratorCommon.AddLine("declare module \"" + obj.Name + "\" {");
             GeneratorCommon.IncreaseIndent();
-            result += GeneratorCommon.AddLine(string.Format("var exp: {0};", obj.Name.Replace("/", ".").Replace("-", "_")));
+            result += GeneratorCommon.AddLine(string.Format("var exp: {0};", GeneratorCommon.EscapeKeywordsInModuleDeclarations(obj.Name).Replace("/", ".").Replace("-", "_")));
             result += GeneratorCommon.AddLine("export=exp;");
             GeneratorCommon.DecreaseIndent();
             result += GeneratorCommon.AddLine("}");
